@@ -28,12 +28,17 @@ Esportare quindi il diagramma in png, caricarlo in un file html e pushare tutto 
 - name
 
 
+
 # courses
 - id 
 - name
 - semester
 
-(Un corso può appartenere anche a più corsi di laurea)
+
+# pivot table: course_degree_courses
+- course_id
+- degree_course_id
+
 
 
 # teachers
@@ -46,8 +51,10 @@ Esportare quindi il diagramma in png, caricarlo in un file html e pushare tutto 
 - qualifications
 - years_of_teaching
 
-(Un insegnante può tenere più di un corso)
 
+# pivot table: course_teacher
+- course_id
+- teacher_id 
 
 
 # exam-dates
@@ -68,8 +75,7 @@ Esportare quindi il diagramma in png, caricarlo in un file html e pushare tutto 
 
 
 
-# grades
-- id
-- student_id (uno studente per ogni voto per ogni appello a cui ha partecipato)
-- grade
-- is_sufficient
+# pivot table: exam_date_student
+- exam_date_id
+- student_id 
+- vote
