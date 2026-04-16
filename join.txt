@@ -1,13 +1,72 @@
-1. Selezionare tutti gli studenti iscritti al Corso di Laurea in Economia
-2. Selezionare tutti i Corsi di Laurea Magistrale del Dipartimento di
-Neuroscienze
-3. Selezionare tutti i corsi in cui insegna Fulvio Amato (id=44)
-4. Selezionare tutti gli studenti con i dati relativi al corso di laurea a cui
-sono iscritti e il relativo dipartimento, in ordine alfabetico per cognome e
-nome
-5. Selezionare tutti i corsi di laurea con i relativi corsi e insegnanti
-6. Selezionare tutti i docenti che insegnano nel Dipartimento di
-Matematica (54)
-7. BONUS: Selezionare per ogni studente il numero di tentativi sostenuti
-per ogni esame, stampando anche il voto massimo. Successivamente,
-filtrare i tentativi con voto minimo 18.
+-- 1. Selezionare tutti gli studenti iscritti al Corso di Laurea in Economia
+
+SELECT DISTINCT　students.name as student_name, students.surname as student_surname, degrees.name as degree_name
+FROM students
+JOIN degrees ON degrees.id = students.degree_id
+WHERE degrees.name = "Corso di Laurea in Economia";
+
+-- 2. Selezionare tutti i Corsi di Laurea Magistrale del Dipartimento di Neuroscienze
+
+SELECT DISTINCT degrees.name as degree_name, degrees.level, departments.name as department_name
+FROM degrees
+JOIN departments ON departments.id = degrees.department_id
+WHERE departments.name = "Dipartimento di Neuroscienze"
+AND degrees.level = "magistrale";
+
+-- 3. Selezionare tutti i corsi in cui insegna Fulvio Amato (id=44)
+
+SELECT courses.name as course_name, teachers.name as teacher_name, teachers.surname as teacher_surname
+FROM courses 
+JOIN course_teacher ON course_teacher.course_id = courses.id
+JOIN teachers ON teachers.id = course_teacher.teacher_id
+WHERE teachers.name = "Fulvio" 
+AND teachers.surname = "Amato";
+
+-- 4. Selezionare tutti gli studenti con i dati relativi al corso di laurea a cui sono iscritti e il relativo dipartimento, in ordine alfabetico per cognome e nome
+SELECT DISTINCT students.surname, students.name, degrees.name as degree_name, departments.name as department_name
+FROM students
+JOIN degrees ON degrees.id = students.degree_id
+JOIN departments ON departments.id = degrees.department_id
+ORDER BY students.surname, students.name;
+
+
+-- 5. Selezionare tutti i corsi di laurea con i relativi corsi e insegnanti
+
+SELECT degrees.name as degree_name, courses.name as course_name, teachers.surname as teacher_surname, teachers.name as teacher_name
+FROM courses
+JOIN degrees ON degrees.id = courses.degree_id
+JOIN course_teacher ON course_teacher.course_id = courses.id
+JOIN teachers ON teachers.id = course_teacher.teacher_id
+ORDER BY degrees.name;
+
+
+-- 6. Selezionare tutti i docenti che insegnano nel Dipartimento di Matematica (54)
+
+SELECT DISTINCT teachers.surname as teacher_surname, teachers.name as teacher_name, departments.name as department_name
+FROM courses
+JOIN degrees ON degrees.id = courses.degree_id
+JOIN course_teacher ON course_teacher.course_id = courses.id
+JOIN teachers ON teachers.id = course_teacher.teacher_id
+JOIN departments ON departments.id = degrees.department_id 
+WHERE departments.name = "Dipartimento di Matematica"
+ORDER BY teachers.surname;
+
+
+
+-- 7. BONUS: Selezionare per ogni studente il numero di tentativi sostenuti　per ogni esame, stampando anche il voto massimo. 
+-- Successivamente, filtrare i tentativi con voto minimo 18.
+
+SELECT COUNT(students.id), students.registration_number, MAX(exam_student.vote), courses.name as course_name
+FROM students
+JOIN exam_student ON exam_student.student_id = students.id
+JOIN exams ON exams.id = exam_student.exam_id
+JOIN courses ON courses.id = exams.course_id
+GROUP BY students.registration_number, course_name;
+
+SELECT COUNT(students.id), students.registration_number, MAX(exam_student.vote), courses.name as course_name
+FROM students
+JOIN exam_student ON exam_student.student_id = students.id
+JOIN exams ON exams.id = exam_student.exam_id
+JOIN courses ON courses.id = exams.course_id
+WHERE exam_student.vote >= 18
+GROUP BY students.registration_number, course_name;
